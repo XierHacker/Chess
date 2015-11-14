@@ -2,6 +2,9 @@
 #include <QPainter>
 #include <QPoint>
 
+#include <iostream>
+using namespace std;
+
 //constructor
 Board::Board(QWidget *parent) : QWidget(parent)
 {
@@ -13,7 +16,11 @@ Board::Board(QWidget *parent) : QWidget(parent)
        s[i].init(i);
     }
 
+    //init selectedID
     selectedID=-1;
+
+    //init redTurn
+    redTurn=true;
 }
 
 
@@ -117,13 +124,13 @@ QPoint Board::rowAndcol_to_point(int id)
 /******realize mouseEvent******/
 void Board::mouseReleaseEvent(QMouseEvent *ev)
 {
-    //get the mouse's position
+    //get the mouse_click's position
     QPoint pos=ev->pos();
 
     int row,col;    //like temp value,and can be changed by the point_to_rowandcol()
 
 
-    //if clicked out the board
+    //if clicked out the board or invalid click
     if(point_to_rowAndcol(pos,row,col)==false)
         return ;
 
@@ -149,23 +156,33 @@ void Board::mouseReleaseEvent(QMouseEvent *ev)
     {
       if(clickedID!=-1) //meanse I clicked on a chesspiece
       {
-          selectedID=clickedID;
-          update();
+          if(s[i].isRed==redTurn)
+          {
+              selectedID=clickedID;
+              update();
+          }
+          else
+              return ;
       }
     }
     else        //means I have chosen a cheespiece and prepare to click the next position
     {
-        s[selectedID].row=row;
-        s[selectedID].col=col;
-        if(clickedID!=-1) //meanse I clicked on a chesspiece
+        //make sure the chesspiece can move
+        if(canMove(selectedID,row,col,clickedID))
         {
-            s[clickedID].isDead=true;
+            //move chesspiece
+            s[selectedID].row=row;
+            s[selectedID].col=col;
+            if(clickedID!=-1) //meanse I clicked on a chesspiece
+            {
+                s[clickedID].isDead=true;
 
+            }
+            selectedID=-1;
+            redTurn=!redTurn;
+            update();
         }
-        update();
     }
-
-
 
 }
 
@@ -193,7 +210,178 @@ bool Board::point_to_rowAndcol(QPoint pt,int& row,int& col)
 }
 
 
+bool Board::canMove(int moveid,int row,int col,int killedid)
+{
 
+    //can't move on to itself
+    if(s[moveid].row==s[killedid].row&&s[moveid].col==s[killedid].col)
+        return false;
+
+    //can't kill the same color.
+    if(s[moveid].isRed==s[killedid].isRed)
+    {
+        //change selection
+        selectedID=killedid;
+        update();
+
+        return false;
+    }
+
+    switch(s[moveid].type)
+        {
+            //JIANG's rule
+            case ChessPieces::JIANG:
+                {
+                    //1.about the col and the row
+                    {
+                         //judge row
+                             if(s[moveid].isRed)
+                            {
+                                 cout<<s[moveid].isRed<<endl;
+                                 if(row>2)
+                                    return false;
+                             }
+                            else
+                            {
+                                cout<<s[moveid].isRed<<endl;
+                                  if(row<7)
+                                    return false;
+                            }
+
+                         //juege col
+                            if(col<3||col>5)
+                                return false;
+                    }
+
+                    //2.important!!!just one row or one col everytime
+                    {
+
+
+                            int d_r=s[moveid].row-row;
+                            int d_c=s[moveid].col-col;
+                            int d=abs(d_r)*10+abs(d_c);
+
+                            if(d==1||d==10)
+                                return true;
+                    }
+
+                     return false;
+                }
+             //CHE's rule
+             case ChessPieces::CHE:
+                {
+                     break;
+                 }
+             //PAO's rule
+             case ChessPieces::PAO:
+                {
+                     break;
+                }
+             //MA's rule
+             case ChessPieces::MA:
+                {
+                    break;
+                }
+
+             //BING's rule
+            case ChessPieces::BING:
+                {
+                    //1.about the col and the row
+
+                            int d_r=s[moveid].row-row;
+                            int d_c=s[moveid].col-col;
+                            int d=abs(d_r)*10+abs(d_c);
+                         //judge row
+                             if(s[moveid].isRed)
+                            {
+                                 cout<<s[moveid].isRed<<endl;
+                                 if(row<5)
+                                 {
+                                     if(d_r==-1&&d_c==0)
+                                         return true;
+
+                                 }
+                                 else
+                                 {
+                                    if(d_r==1)
+                                        return false;
+                                    if(d==1||d==10)
+                                        return true;
+
+                                 }
+
+                             }
+                            else
+                            {
+                                 cout<<s[moveid].isRed<<endl;
+                                 if(row>4)
+                                 {
+                                     if(d_r==1&&d_c==0)
+                                         return true;
+                                 }
+                                 else
+                                 {
+                                     if(d_r==-1)
+                                         return false;
+                                     if(d==1||d==10)
+                                         return true;
+
+                                 }
+                            }
+                         //return false;
+
+                }
+
+
+             //SHI's rule
+            case ChessPieces::SHI:
+                {
+                    //1.about the col and the row
+                    {
+                         //judge row
+                             if(s[moveid].isRed)
+                            {
+                                 cout<<s[moveid].isRed<<endl;
+                                 if(row>2)
+                                    return false;
+                             }
+                            else
+                            {
+                                cout<<s[moveid].isRed<<endl;
+                                  if(row<7)
+                                    return false;
+                            }
+
+                         //juege col
+                            if(col<3||col>5)
+                                return false;
+                    }
+
+                    //2.important!!!just one row or one col everytime
+                    {
+
+
+                            int d_r=s[moveid].row-row;
+                            int d_c=s[moveid].col-col;
+                            int d=abs(d_r)*10+abs(d_c);
+
+                            if(d==11)
+                                return true;
+                    }
+
+                     return false;
+                }
+
+             //XIANG's rule
+            case ChessPieces::XIANG:
+                {
+                     break;
+                }
+
+        }
+       return true;
+
+}
 
 
 

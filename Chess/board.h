@@ -19,6 +19,7 @@ public:
 
     int r; //the ridiant of chesspieces
     int selectedID;
+    bool redTurn;
 
     QPoint rowAndcol_to_point(int row,int col);
     QPoint rowAndcol_to_point(int id); //overload locate
@@ -26,6 +27,9 @@ public:
 
     void drawChesspieces(QPainter & painter,int id);
 
+
+    //rule methoed
+    bool canMove(int moveid,int row,int col,int killedid);
 
     //overload paintEvent() to draw
     virtual void paintEvent(QPaintEvent *);

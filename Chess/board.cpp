@@ -119,19 +119,40 @@ QPoint Board::rowAndcol_to_point(int id)
     return rowAndcol_to_point(s[id].row,s[id].col);
 }
 
+//locate the most suited col_and_row
+bool Board::point_to_rowAndcol(QPoint pt,int& row,int& col)
+{
+    for(row=0;row<=9;row++)
+    {
+        for(col=0;col<=8;col++)
+        {
+            //get rowAndcol's coordinate
+            QPoint c=rowAndcol_to_point(row,col);
+
+            //find the min distance
+            int dx=c.x()-pt.x();
+            int dy=c.y()-pt.y();
+            int d=dx*dx+dy*dy;
+            if(d<r*r)
+                return true;
+         }
+    }
+    return false;
+}
+
 
 
 /******realize mouseEvent******/
 void Board::mouseReleaseEvent(QMouseEvent *ev)
 {
     //get the mouse_click's position
-    QPoint pos=ev->pos();
+    point=ev->pos();
 
     int row,col;    //like temp value,and can be changed by the point_to_rowandcol()
 
 
     //if clicked out the board or invalid click
-    if(point_to_rowAndcol(pos,row,col)==false)
+    if(point_to_rowAndcol(point,row,col)==false)
         return ;
 
 
@@ -188,27 +209,47 @@ void Board::mouseReleaseEvent(QMouseEvent *ev)
 
 
 
-//locate the most suited colandrow
-bool Board::point_to_rowAndcol(QPoint pt,int& row,int& col)
+
+int Board::chessOnLine(int start_row,int start_col,int target_row,int target_col)
 {
-    for(row=0;row<=9;row++)
+    int num=0;
+
+    //can't be the same
+    if(start_row==target_row&&start_col==target_col)
+        return -1;
+
+    //don't in a line
+    if(start_row!=target_row&&start_col!=target_col)
+        return -1;
+
+    if(start_row==target_row)
     {
-        for(col=0;col<=8;col++)
+        int min=(start_col>target_col)?target_col:start_col;
+        int max=(start_col>target_col)?start_col:target_col;
+        for(int i=min;i<max;i++)
         {
-            //get rowAndcol's coordinate
-            QPoint c=rowAndcol_to_point(row,col);
-
-            //find the min distance
-            int dx=c.x()-pt.x();
-            int dy=c.y()-pt.y();
-            int d=dx*dx+dy*dy;
-            if(d<r*r)
-                return true;
-         }
+            for(int j=0;j<32;j++)
+            {
+                if(s[j].row==start_row&&s[j].col==i&&s[j].isDead==false)
+                    ++num;
+            }
+        }
     }
-    return false;
+    else
+    {
+        int min=(start_row>target_row)?target_row:start_row;
+        int max=(start_row>target_row)?start_row:target_row;
+        for(int i=min;i<max;i++)
+        {
+            for(int j=0;j<32;j++)
+            {
+                if(s[j].row==start_row&&s[j].col==i&&s[j].isDead==false)
+                    ++num;
+            }
+        }
+    }
+        return num;
 }
-
 
 bool Board::canMove(int moveid,int row,int col,int killedid)
 {
@@ -286,6 +327,12 @@ bool Board::canMove(int moveid,int row,int col,int killedid)
              //BING's rule
             case ChessPieces::BING:
                 {
+                            //testing fuction
+                            int cur_row;
+                            int cur_col;
+                            point_to_rowAndcol(point,cur_row,cur_col);
+
+                            cout<<chessOnLine(cur_row,cur_col,row,col)<<endl;
                     //1.about the col and the row
 
                             int d_r=s[moveid].row-row;
@@ -294,7 +341,7 @@ bool Board::canMove(int moveid,int row,int col,int killedid)
                          //judge row
                              if(s[moveid].isRed)
                             {
-                                 cout<<s[moveid].isRed<<endl;
+                               //  cout<<s[moveid].isRed<<endl;
                                  if(row<5)
                                  {
                                      if(d_r==-1&&d_c==0)
@@ -313,7 +360,7 @@ bool Board::canMove(int moveid,int row,int col,int killedid)
                              }
                             else
                             {
-                                 cout<<s[moveid].isRed<<endl;
+                                //test: cout<<s[moveid].isRed<<endl;
                                  if(row>4)
                                  {
                                      if(d_r==1&&d_c==0)

@@ -21,21 +21,26 @@ public:
     int selectedID;
     bool redTurn;
 
-    QPoint rowAndcol_to_point(int row,int col);
-    QPoint rowAndcol_to_point(int id); //overload locate
-    bool   point_to_rowAndcol(QPoint pt,int& row,int& col);
+    QPoint point; //record the current mouse's click position
 
-    void drawChesspieces(QPainter & painter,int id);
 
 
     //rule methoed
     bool canMove(int moveid,int row,int col,int killedid);
 
+    //count the number of chesspices on the same line
+    int chessOnLine(int start_row,int start_col,int target_row,int target_col);
+
     //overload paintEvent() to draw
     virtual void paintEvent(QPaintEvent *);
+    void drawChesspieces(QPainter & painter,int id);
 
     //overload mouseReleaseEvent() to response mouse action
     virtual void mouseReleaseEvent(QMouseEvent *ev);
+
+    QPoint rowAndcol_to_point(int row,int col);
+    QPoint rowAndcol_to_point(int id); //overload locate
+    bool   point_to_rowAndcol(QPoint pt,int& row,int& col);
 
 signals:
 

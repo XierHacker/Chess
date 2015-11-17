@@ -541,9 +541,10 @@ compiler_rcc_clean:
 compiler_moc_header_make_all: moc_board.cpp
 compiler_moc_header_clean:
 	-$(DEL_FILE) moc_board.cpp
-moc_board.cpp: ../../../../Qt5.5.1/5.5/gcc_64/include/QtWidgets/QWidget \
-		../../../../Qt5.5.1/5.5/gcc_64/include/QtWidgets/qwidget.h \
-		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/qwindowdefs.h \
+moc_board.cpp: ../Chess/chesspieces.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/QString \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qstring.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qchar.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qglobal.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qconfig.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qfeatures.h \
@@ -572,17 +573,20 @@ moc_board.cpp: ../../../../Qt5.5.1/5.5/gcc_64/include/QtWidgets/QWidget \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qglobalstatic.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qmutex.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qnumeric.h \
-		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qobjectdefs.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qbytearray.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qrefcount.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qnamespace.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qarraydata.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qstringbuilder.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/QPoint \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qpoint.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtWidgets/QWidget \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtWidgets/qwidget.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/qwindowdefs.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qobjectdefs.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qobjectdefs_impl.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/qwindowdefs_win.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qobject.h \
-		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qstring.h \
-		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qchar.h \
-		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qbytearray.h \
-		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qrefcount.h \
-		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qarraydata.h \
-		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qstringbuilder.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qlist.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qalgorithms.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qiterator.h \
@@ -601,7 +605,6 @@ moc_board.cpp: ../../../../Qt5.5.1/5.5/gcc_64/include/QtWidgets/QWidget \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/qpaintdevice.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qrect.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qsize.h \
-		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qpoint.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/qpalette.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/qcolor.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/qrgb.h \
@@ -643,6 +646,7 @@ moc_board.cpp: ../../../../Qt5.5.1/5.5/gcc_64/include/QtWidgets/QWidget \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qfiledevice.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/qvector2d.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/qtouchdevice.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/QMouseEvent \
 		../Chess/board.h
 	/home/xierhacker/Qt5.5.1/5.5/gcc_64/bin/moc $(DEFINES) -I/home/xierhacker/Qt5.5.1/5.5/gcc_64/mkspecs/linux-g++ -I/home/xierhacker/Workspace/GitHub/Chess/Chess -I/home/xierhacker/Qt5.5.1/5.5/gcc_64/include -I/home/xierhacker/Qt5.5.1/5.5/gcc_64/include/QtWidgets -I/home/xierhacker/Qt5.5.1/5.5/gcc_64/include/QtGui -I/home/xierhacker/Qt5.5.1/5.5/gcc_64/include/QtCore -I. ../Chess/board.h -o moc_board.cpp
 
@@ -661,9 +665,10 @@ compiler_clean: compiler_moc_header_clean
 ####### Compile
 
 board.o: ../Chess/board.cpp ../Chess/board.h \
-		../../../../Qt5.5.1/5.5/gcc_64/include/QtWidgets/QWidget \
-		../../../../Qt5.5.1/5.5/gcc_64/include/QtWidgets/qwidget.h \
-		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/qwindowdefs.h \
+		../Chess/chesspieces.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/QString \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qstring.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qchar.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qglobal.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qconfig.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qfeatures.h \
@@ -692,17 +697,20 @@ board.o: ../Chess/board.cpp ../Chess/board.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qglobalstatic.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qmutex.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qnumeric.h \
-		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qobjectdefs.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qbytearray.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qrefcount.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qnamespace.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qarraydata.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qstringbuilder.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/QPoint \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qpoint.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtWidgets/QWidget \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtWidgets/qwidget.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/qwindowdefs.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qobjectdefs.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qobjectdefs_impl.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/qwindowdefs_win.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qobject.h \
-		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qstring.h \
-		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qchar.h \
-		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qbytearray.h \
-		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qrefcount.h \
-		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qarraydata.h \
-		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qstringbuilder.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qlist.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qalgorithms.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qiterator.h \
@@ -721,7 +729,6 @@ board.o: ../Chess/board.cpp ../Chess/board.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/qpaintdevice.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qrect.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qsize.h \
-		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qpoint.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/qpalette.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/qcolor.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/qrgb.h \
@@ -763,6 +770,7 @@ board.o: ../Chess/board.cpp ../Chess/board.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qfiledevice.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/qvector2d.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/qtouchdevice.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/QMouseEvent \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/QPainter \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/qpainter.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/qtextoption.h \
@@ -878,10 +886,50 @@ run.o: ../Chess/run.cpp ../../../../Qt5.5.1/5.5/gcc_64/include/QtWidgets/QApplic
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/qguiapplication.h \
 		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/qinputmethod.h \
 		../Chess/board.h \
-		../../../../Qt5.5.1/5.5/gcc_64/include/QtWidgets/QWidget
+		../Chess/chesspieces.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/QString \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/QPoint \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtWidgets/QWidget \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtGui/QMouseEvent
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o run.o ../Chess/run.cpp
 
-chesspieces.o: ../Chess/chesspieces.cpp ../Chess/chesspieces.h
+chesspieces.o: ../Chess/chesspieces.cpp ../Chess/chesspieces.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/QString \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qstring.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qchar.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qglobal.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qconfig.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qfeatures.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qsystemdetection.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qprocessordetection.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qtypeinfo.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qtypetraits.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qsysinfo.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qlogging.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qflags.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qatomic.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qbasicatomic.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qgenericatomic.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qatomic_gcc.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qatomic_msvc.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qatomic_armv7.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qatomic_armv6.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qatomic_armv5.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qatomic_ia64.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qatomic_mips.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qatomic_x86.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qatomic_unix.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qglobalstatic.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qmutex.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qnumeric.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qbytearray.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qrefcount.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qnamespace.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qarraydata.h \
+		../../../../Qt5.5.1/5.5/gcc_64/include/QtCore/qstringbuilder.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o chesspieces.o ../Chess/chesspieces.cpp
 
 moc_board.o: moc_board.cpp 

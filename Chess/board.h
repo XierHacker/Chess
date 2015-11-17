@@ -21,7 +21,8 @@ public:
     int selectedID;
     bool redTurn;
 
-    QPoint point; //record the current mouse's click position
+
+   int isExistChesspieces(int row,int col);  //and return the id.
 
 
 

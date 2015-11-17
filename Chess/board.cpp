@@ -119,6 +119,8 @@ QPoint Board::rowAndcol_to_point(int id)
     return rowAndcol_to_point(s[id].row,s[id].col);
 }
 
+
+
 //locate the most suited col_and_row
 bool Board::point_to_rowAndcol(QPoint pt,int& row,int& col)
 {
@@ -140,19 +142,27 @@ bool Board::point_to_rowAndcol(QPoint pt,int& row,int& col)
     return false;
 }
 
-
+int Board::isExistChesspieces(int row,int col)
+{
+   for(int i=0;i<32;i++)
+   {
+       if(s[i].row==row&&s[i].col==col&&s[i].isDead==false)
+           return i;
+   }
+   return -1;
+}
 
 /******realize mouseEvent******/
 void Board::mouseReleaseEvent(QMouseEvent *ev)
 {
     //get the mouse_click's position
-    point=ev->pos();
+    QPoint pos=ev->pos();
 
     int row,col;    //like temp value,and can be changed by the point_to_rowandcol()
 
 
     //if clicked out the board or invalid click
-    if(point_to_rowAndcol(point,row,col)==false)
+    if(point_to_rowAndcol(pos,row,col)==false)
         return ;
 
 
@@ -226,7 +236,7 @@ int Board::chessOnLine(int start_row,int start_col,int target_row,int target_col
     {
         int min=(start_col>target_col)?target_col:start_col;
         int max=(start_col>target_col)?start_col:target_col;
-        for(int i=min;i<max;i++)
+        for(int i=min+1;i<max;i++)
         {
             for(int j=0;j<32;j++)
             {
@@ -234,21 +244,23 @@ int Board::chessOnLine(int start_row,int start_col,int target_row,int target_col
                     ++num;
             }
         }
+        return num;
     }
-    else
+    if(start_col==target_col)
     {
         int min=(start_row>target_row)?target_row:start_row;
         int max=(start_row>target_row)?start_row:target_row;
-        for(int i=min;i<max;i++)
+        for(int i=min+1;i<max;i++)
         {
             for(int j=0;j<32;j++)
             {
-                if(s[j].row==start_row&&s[j].col==i&&s[j].isDead==false)
+                if(s[j].col==start_col&&s[j].row==i&&s[j].isDead==false)
                     ++num;
             }
         }
-    }
         return num;
+    }
+      //  return num;
 }
 
 bool Board::canMove(int moveid,int row,int col,int killedid)
@@ -268,161 +280,270 @@ bool Board::canMove(int moveid,int row,int col,int killedid)
         return false;
     }
 
+    int d_r=s[moveid].row-row;
+    int d_c=s[moveid].col-col;
+    int d=abs(d_r)*10+abs(d_c);
+
     switch(s[moveid].type)
         {
-            //JIANG's rule
+            /*JIANG's rule*/
             case ChessPieces::JIANG:
                 {
-                    //1.about the col and the row
+                    //judge row
+                    if(s[moveid].isRed) //red
                     {
-                         //judge row
-                             if(s[moveid].isRed)
-                            {
-                                 cout<<s[moveid].isRed<<endl;
-                                 if(row>2)
-                                    return false;
-                             }
-                            else
-                            {
-                                cout<<s[moveid].isRed<<endl;
-                                  if(row<7)
-                                    return false;
-                            }
-
-                         //juege col
-                            if(col<3||col>5)
-                                return false;
+                        if(row>2)
+                            return false;
                     }
-
-                    //2.important!!!just one row or one col everytime
+                    else                //black
                     {
-
-
-                            int d_r=s[moveid].row-row;
-                            int d_c=s[moveid].col-col;
-                            int d=abs(d_r)*10+abs(d_c);
-
-                            if(d==1||d==10)
-                                return true;
+                        if(row<7)
+                            return false;
                     }
+                    //juege col
+                    if(col<3||col>5)
+                        return false;
 
-                     return false;
+
+                    //only one strait step
+                    if(d==1||d==10)
+                       return true;
+
+                    return false;
                 }
-             //CHE's rule
+
+
+             /*CHE's rule*/
              case ChessPieces::CHE:
                 {
-                     break;
+                    //test
+                    cout<<chessOnLine(s[moveid].row,s[moveid].col,row,col)<<endl;
+
+                    //should in a line
+                    if(s[moveid].row!=row&&s[moveid].col!=col)
+                        return false;
+
+                    //should exist nothin in front of CHE
+                    if(chessOnLine(s[moveid].row,s[moveid].col,row,col)!=0)
+                        return false;
+
+                    return true;
+
                  }
-             //PAO's rule
+
+
+             /*PAO's rule*/
              case ChessPieces::PAO:
                 {
-                     break;
+                    //test
+                        cout<<chessOnLine(s[moveid].row,s[moveid].col,row,col)<<endl;
+
+                    //should in a line
+                       if(s[moveid].row!=row&&s[moveid].col!=col)
+                          return false;
+
+                    //should exist no more than tow chesspices in front of CHE
+                       if(chessOnLine(s[moveid].row,s[moveid].col,row,col)>1)
+                       {
+                            return false;
+                       }
+                      else if(chessOnLine(s[moveid].row,s[moveid].col,row,col)==1)
+                       {
+                           int ID=isExistChesspieces(row,col);
+                           if(ID!=-1&&s[moveid].isRed!=s[ID].isRed)
+                           {
+                               return true;
+                           }
+
+                           return false;
+
+                       }
+                       else if(chessOnLine(s[moveid].row,s[moveid].col,row,col)==0)
+                       {
+                           if(isExistChesspieces(row,col)!=-1)
+                               return false;
+
+                       }
+                       else
+                       {
+                           return false;
+                       }
+
+                       return true;
+
                 }
-             //MA's rule
+
+
+             /*MA's rule*/
              case ChessPieces::MA:
                 {
-                    break;
-                }
-
-             //BING's rule
-            case ChessPieces::BING:
-                {
-                            //testing fuction
-                            int cur_row;
-                            int cur_col;
-                            point_to_rowAndcol(point,cur_row,cur_col);
-
-                            cout<<chessOnLine(cur_row,cur_col,row,col)<<endl;
-                    //1.about the col and the row
-
-                            int d_r=s[moveid].row-row;
-                            int d_c=s[moveid].col-col;
-                            int d=abs(d_r)*10+abs(d_c);
-                         //judge row
-                             if(s[moveid].isRed)
+                    if(d!=12&&d!=21)
+                        return false;
+                    else
+                    {
+                        if(abs(d_r)>abs(d_c))
+                        {
+                            if(s[moveid].row>row)
                             {
-                               //  cout<<s[moveid].isRed<<endl;
-                                 if(row<5)
-                                 {
-                                     if(d_r==-1&&d_c==0)
-                                         return true;
+                                if(isExistChesspieces(row+1,s[moveid].col)!=-1)
+                                    return false;
 
-                                 }
-                                 else
-                                 {
-                                    if(d_r==1)
-                                        return false;
-                                    if(d==1||d==10)
-                                        return true;
-
-                                 }
-
-                             }
+                            }
                             else
                             {
-                                //test: cout<<s[moveid].isRed<<endl;
-                                 if(row>4)
-                                 {
-                                     if(d_r==1&&d_c==0)
-                                         return true;
-                                 }
-                                 else
-                                 {
-                                     if(d_r==-1)
-                                         return false;
-                                     if(d==1||d==10)
-                                         return true;
-
-                                 }
+                                if(isExistChesspieces(row-1,s[moveid].col)!=-1)
+                                    return false;
                             }
+                        }
+                        else
+                        {
+                            if(s[moveid].col>col)
+                            {
+                                if(isExistChesspieces(s[moveid].row,col+1)!=-1)
+                                    return false;
+
+                            }
+                            else
+                            {
+                                if(isExistChesspieces(s[moveid].row,col-1)!=-1)
+                                    return false;
+                            }
+
+                        }
+                    }
+
+                    return true;
+
+                }
+
+             /*BING's rule*/
+            case ChessPieces::BING:
+                {
+                    //test
+                    cout<<chessOnLine(s[moveid].row,s[moveid].col,row,col)<<endl;
+
+                    if(s[moveid].isRed)        //red BING
+                    {
+                        if(row<5)
+                        {
+                            if(d_r==-1&&d_c==0)
+                                return true;
+                            else
+                                return false;
+
+                        }
+                        else
+                        {
+                            if(d_r==1)
+                                return false;
+                            if(d==1||d==10)
+                                return true;
+                        }
+
+                     }
+                    else                //black BING
+                    {
+                        if(row>4)
+                        {
+                            if(d_r==1&&d_c==0)
+                                 return true;
+                            else
+                                 return false;
+                        }
+                        else
+                        {
+                            if(d_r==-1)
+                                 return false;
+                            if(d==1||d==10)
+                                 return true;
+
+                        }
+                     }
                          //return false;
 
                 }
 
 
-             //SHI's rule
+             /*SHI's rule*/
             case ChessPieces::SHI:
                 {
-                    //1.about the col and the row
+                    int d_r=s[moveid].row-row;
+                    int d_c=s[moveid].col-col;
+                    int d=abs(d_r)*10+abs(d_c);
+
+                     //judge row
+                    if(s[moveid].isRed)     //red
                     {
-                         //judge row
-                             if(s[moveid].isRed)
+                        if(row>2)
+                        return false;
+                    }
+                   else                     //black
+                    {
+                        if(row<7)
+                        return false;
+                    }
+
+                    //juege col
+                    if(col<3||col>5)
+                       return false;
+
+                    //2.just one slash
+                    if(d==11)
+                       return true;
+                    return false;
+                }
+
+             /*XIANG's rule*/
+            case ChessPieces::XIANG:
+                {
+                    //can't pass the river
+                    if(s[moveid].isRed)         //red
+                    {
+                        if(row>4)
+                            return false;
+                    }
+                    else                        //black
+                    {
+                        if(row<5)
+                            return false;
+
+                    }
+
+                    if(d!=22)
+                        return false;
+                    else
+                    {
+                         if(s[moveid].row>row)
+                         {
+                            if(s[moveid].col>col)
                             {
-                                 cout<<s[moveid].isRed<<endl;
-                                 if(row>2)
+                                if(isExistChesspieces(row+1,col+1)!=-1)
                                     return false;
-                             }
+                            }
                             else
                             {
-                                cout<<s[moveid].isRed<<endl;
-                                  if(row<7)
+                                if(isExistChesspieces(row+1,col-1)!=-1)
                                     return false;
                             }
 
-                         //juege col
-                            if(col<3||col>5)
-                                return false;
+                         }
+                         else
+                         {
+                             if(s[moveid].col>col)
+                             {
+                                 if(isExistChesspieces(row-1,col+1)!=-1)
+                                     return false;
+                             }
+                             else
+                             {
+                                 if(isExistChesspieces(row-1,col-1)!=-1)
+                                     return false;
+                             }
+                         }
+
                     }
 
-                    //2.important!!!just one row or one col everytime
-                    {
-
-
-                            int d_r=s[moveid].row-row;
-                            int d_c=s[moveid].col-col;
-                            int d=abs(d_r)*10+abs(d_c);
-
-                            if(d==11)
-                                return true;
-                    }
-
-                     return false;
-                }
-
-             //XIANG's rule
-            case ChessPieces::XIANG:
-                {
-                     break;
+                    return true;
                 }
 
         }

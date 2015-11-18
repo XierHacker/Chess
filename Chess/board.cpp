@@ -13,11 +13,11 @@ Board::Board(QWidget *parent) : QWidget(parent)
     //init chesspicese
     for(int i=0;i<32;i++)
     {
-       s[i].init(i);
+       chesspieces[i].init(i);
     }
 
     //init selectedID
-    selectedID=-1;
+    start_ID=-1;
 
     //init redTurn
     redTurn=true;
@@ -67,7 +67,7 @@ void Board::paintEvent(QPaintEvent *)
     //draw chesspieces
     for(int i=0;i<32;i++)
     {
-        drawChesspieces(painter,s[i].id);
+        drawChesspieces(painter,chesspieces[i].id);
     }
 
 }
@@ -79,8 +79,9 @@ void Board::paintEvent(QPaintEvent *)
  {
 
     //if dead,should not draw that
-    if(s[id].isDead)
+    if(chesspieces[id].isDead)
         return ;
+
     //get center location
     QPoint c=rowAndcol_to_point(id);
 
@@ -88,20 +89,20 @@ void Board::paintEvent(QPaintEvent *)
     QRect rect=QRect(c.x()-r,c.y()-r,r*2,r*2);
 
     //set Brush's color
-    if(id==selectedID)
+    if(id==start_ID)
         painter.setBrush(Qt::yellow);
     else
         painter.setBrush(QBrush(QColor(128,64,0)));
 
     painter.setPen(Qt::black);
 
-    painter.drawEllipse(rowAndcol_to_point(s[id].row,s[id].col),r,r);
+    painter.drawEllipse(rowAndcol_to_point(chesspieces[id].row,chesspieces[id].col),r,r);
 
-    if(s[id].isRed)
+    if(chesspieces[id].isRed)
         painter.setPen(Qt::red);
 
     painter.setFont(QFont("system",r/3,100));
-    painter.drawText(rect,s[id].getName(),QTextOption(Qt::AlignCenter));
+    painter.drawText(rect,chesspieces[id].getName(),QTextOption(Qt::AlignCenter));
  }
 
 
@@ -116,7 +117,7 @@ QPoint Board::rowAndcol_to_point(int row,int col)
 
 QPoint Board::rowAndcol_to_point(int id)
 {
-    return rowAndcol_to_point(s[id].row,s[id].col);
+    return rowAndcol_to_point(chesspieces[id].row,chesspieces[id].col);
 }
 
 
@@ -142,14 +143,24 @@ bool Board::point_to_rowAndcol(QPoint pt,int& row,int& col)
     return false;
 }
 
+//judge whether there exist a chesspices
 int Board::isExistChesspieces(int row,int col)
 {
    for(int i=0;i<32;i++)
    {
-       if(s[i].row==row&&s[i].col==col&&s[i].isDead==false)
+       if(chesspieces[i].row==row&&chesspieces[i].col==col&&chesspieces[i].isDead==false)
            return i;
    }
    return -1;
+}
+
+//juege same color
+bool Board::isSameColor(int id1,int id2)
+{
+    if(chesspieces[id1].isRed==chesspieces[id2].isRed)
+        return true;
+    else
+        return false;
 }
 
 /******realize mouseEvent******/
@@ -167,29 +178,19 @@ void Board::mouseReleaseEvent(QMouseEvent *ev)
 
 
     //find which chesspiece i click
-    int i=0;
+    int temp_ID=isExistChesspieces(row,col);
     int clickedID=-1;
-    for(;i<32;i++)
-    {
-        if(s[i].row==row&&s[i].col==col&&s[i].isDead==false)
-        {
-            break;
-        }
-    }
+    if(temp_ID!=-1)
+        clickedID=temp_ID;
 
-    if(i<32)
-    {
-        clickedID=i;
-     //   update();
-    }
-
-    if(selectedID==-1) //means I haven't chosen a chesspiece
+    if(start_ID==-1) //means I haven't chosen a chesspiece
     {
       if(clickedID!=-1) //meanse I clicked on a chesspiece
       {
-          if(s[i].isRed==redTurn)
+          //color should correspond to the game turn
+          if(chesspieces[temp_ID].isRed==redTurn)
           {
-              selectedID=clickedID;
+              start_ID=clickedID;
               update();
           }
           else
@@ -199,17 +200,17 @@ void Board::mouseReleaseEvent(QMouseEvent *ev)
     else        //means I have chosen a cheespiece and prepare to click the next position
     {
         //make sure the chesspiece can move
-        if(canMove(selectedID,row,col,clickedID))
+        if(canMove(start_ID,row,col,clickedID))
         {
             //move chesspiece
-            s[selectedID].row=row;
-            s[selectedID].col=col;
+            chesspieces[start_ID].row=row;
+            chesspieces[start_ID].col=col;
             if(clickedID!=-1) //meanse I clicked on a chesspiece
             {
-                s[clickedID].isDead=true;
+                chesspieces[clickedID].isDead=true;
 
             }
-            selectedID=-1;
+            start_ID=-1;
             redTurn=!redTurn;
             update();
         }
@@ -224,25 +225,19 @@ int Board::chessOnLine(int start_row,int start_col,int target_row,int target_col
 {
     int num=0;
 
-    //can't be the same
-    if(start_row==target_row&&start_col==target_col)
-        return -1;
-
     //don't in a line
     if(start_row!=target_row&&start_col!=target_col)
         return -1;
 
-    if(start_row==target_row)
+
+    if(start_row==target_row)   //in same line
     {
         int min=(start_col>target_col)?target_col:start_col;
         int max=(start_col>target_col)?start_col:target_col;
         for(int i=min+1;i<max;i++)
         {
-            for(int j=0;j<32;j++)
-            {
-                if(s[j].row==start_row&&s[j].col==i&&s[j].isDead==false)
-                    ++num;
-            }
+            if(isExistChesspieces(start_row,i)!=-1)
+                ++num;
         }
         return num;
     }
@@ -252,11 +247,8 @@ int Board::chessOnLine(int start_row,int start_col,int target_row,int target_col
         int max=(start_row>target_row)?start_row:target_row;
         for(int i=min+1;i<max;i++)
         {
-            for(int j=0;j<32;j++)
-            {
-                if(s[j].col==start_col&&s[j].row==i&&s[j].isDead==false)
-                    ++num;
-            }
+            if(isExistChesspieces(i,start_col)!=-1)
+                ++num;
         }
         return num;
     }
@@ -267,30 +259,30 @@ bool Board::canMove(int moveid,int row,int col,int killedid)
 {
 
     //can't move on to itself
-    if(s[moveid].row==s[killedid].row&&s[moveid].col==s[killedid].col)
+    if(chesspieces[moveid].row==chesspieces[killedid].row&&chesspieces[moveid].col==chesspieces[killedid].col)
         return false;
 
     //can't kill the same color.
-    if(s[moveid].isRed==s[killedid].isRed)
+    if(isSameColor(moveid,killedid))
     {
         //change selection
-        selectedID=killedid;
+        start_ID=killedid;
         update();
 
         return false;
     }
 
-    int d_r=s[moveid].row-row;
-    int d_c=s[moveid].col-col;
+    int d_r=chesspieces[moveid].row-row;
+    int d_c=chesspieces[moveid].col-col;
     int d=abs(d_r)*10+abs(d_c);
 
-    switch(s[moveid].type)
+    switch(chesspieces[moveid].type)
         {
             /*JIANG's rule*/
             case ChessPieces::JIANG:
                 {
                     //judge row
-                    if(s[moveid].isRed) //red
+                    if(chesspieces[moveid].isRed) //red
                     {
                         if(row>2)
                             return false;
@@ -317,14 +309,14 @@ bool Board::canMove(int moveid,int row,int col,int killedid)
              case ChessPieces::CHE:
                 {
                     //test
-                    cout<<chessOnLine(s[moveid].row,s[moveid].col,row,col)<<endl;
+                    cout<<chessOnLine(chesspieces[moveid].row,chesspieces[moveid].col,row,col)<<endl;
 
                     //should in a line
-                    if(s[moveid].row!=row&&s[moveid].col!=col)
+                    if(chesspieces[moveid].row!=row&&chesspieces[moveid].col!=col)
                         return false;
 
                     //should exist nothin in front of CHE
-                    if(chessOnLine(s[moveid].row,s[moveid].col,row,col)!=0)
+                    if(chessOnLine(chesspieces[moveid].row,chesspieces[moveid].col,row,col)!=0)
                         return false;
 
                     return true;
@@ -336,21 +328,21 @@ bool Board::canMove(int moveid,int row,int col,int killedid)
              case ChessPieces::PAO:
                 {
                     //test
-                        cout<<chessOnLine(s[moveid].row,s[moveid].col,row,col)<<endl;
+                        cout<<chessOnLine(chesspieces[moveid].row,chesspieces[moveid].col,row,col)<<endl;
 
                     //should in a line
-                       if(s[moveid].row!=row&&s[moveid].col!=col)
+                       if(chesspieces[moveid].row!=row&&chesspieces[moveid].col!=col)
                           return false;
 
                     //should exist no more than tow chesspices in front of CHE
-                       if(chessOnLine(s[moveid].row,s[moveid].col,row,col)>1)
+                       if(chessOnLine(chesspieces[moveid].row,chesspieces[moveid].col,row,col)>1)
                        {
                             return false;
                        }
-                      else if(chessOnLine(s[moveid].row,s[moveid].col,row,col)==1)
+                      else if(chessOnLine(chesspieces[moveid].row,chesspieces[moveid].col,row,col)==1)
                        {
                            int ID=isExistChesspieces(row,col);
-                           if(ID!=-1&&s[moveid].isRed!=s[ID].isRed)
+                           if(ID!=-1&&chesspieces[moveid].isRed!=chesspieces[ID].isRed)
                            {
                                return true;
                            }
@@ -358,7 +350,7 @@ bool Board::canMove(int moveid,int row,int col,int killedid)
                            return false;
 
                        }
-                       else if(chessOnLine(s[moveid].row,s[moveid].col,row,col)==0)
+                       else if(chessOnLine(chesspieces[moveid].row,chesspieces[moveid].col,row,col)==0)
                        {
                            if(isExistChesspieces(row,col)!=-1)
                                return false;
@@ -383,29 +375,29 @@ bool Board::canMove(int moveid,int row,int col,int killedid)
                     {
                         if(abs(d_r)>abs(d_c))
                         {
-                            if(s[moveid].row>row)
+                            if(chesspieces[moveid].row>row)
                             {
-                                if(isExistChesspieces(row+1,s[moveid].col)!=-1)
+                                if(isExistChesspieces(row+1,chesspieces[moveid].col)!=-1)
                                     return false;
 
                             }
                             else
                             {
-                                if(isExistChesspieces(row-1,s[moveid].col)!=-1)
+                                if(isExistChesspieces(row-1,chesspieces[moveid].col)!=-1)
                                     return false;
                             }
                         }
                         else
                         {
-                            if(s[moveid].col>col)
+                            if(chesspieces[moveid].col>col)
                             {
-                                if(isExistChesspieces(s[moveid].row,col+1)!=-1)
+                                if(isExistChesspieces(chesspieces[moveid].row,col+1)!=-1)
                                     return false;
 
                             }
                             else
                             {
-                                if(isExistChesspieces(s[moveid].row,col-1)!=-1)
+                                if(isExistChesspieces(chesspieces[moveid].row,col-1)!=-1)
                                     return false;
                             }
 
@@ -420,9 +412,9 @@ bool Board::canMove(int moveid,int row,int col,int killedid)
             case ChessPieces::BING:
                 {
                     //test
-                    cout<<chessOnLine(s[moveid].row,s[moveid].col,row,col)<<endl;
+                    cout<<chessOnLine(chesspieces[moveid].row,chesspieces[moveid].col,row,col)<<endl;
 
-                    if(s[moveid].isRed)        //red BING
+                    if(chesspieces[moveid].isRed)        //red BING
                     {
                         if(row<5)
                         {
@@ -467,12 +459,12 @@ bool Board::canMove(int moveid,int row,int col,int killedid)
              /*SHI's rule*/
             case ChessPieces::SHI:
                 {
-                    int d_r=s[moveid].row-row;
-                    int d_c=s[moveid].col-col;
+                    int d_r=chesspieces[moveid].row-row;
+                    int d_c=chesspieces[moveid].col-col;
                     int d=abs(d_r)*10+abs(d_c);
 
                      //judge row
-                    if(s[moveid].isRed)     //red
+                    if(chesspieces[moveid].isRed)     //red
                     {
                         if(row>2)
                         return false;
@@ -497,7 +489,7 @@ bool Board::canMove(int moveid,int row,int col,int killedid)
             case ChessPieces::XIANG:
                 {
                     //can't pass the river
-                    if(s[moveid].isRed)         //red
+                    if(chesspieces[moveid].isRed)         //red
                     {
                         if(row>4)
                             return false;
@@ -513,9 +505,9 @@ bool Board::canMove(int moveid,int row,int col,int killedid)
                         return false;
                     else
                     {
-                         if(s[moveid].row>row)
+                         if(chesspieces[moveid].row>row)
                          {
-                            if(s[moveid].col>col)
+                            if(chesspieces[moveid].col>col)
                             {
                                 if(isExistChesspieces(row+1,col+1)!=-1)
                                     return false;
@@ -529,7 +521,7 @@ bool Board::canMove(int moveid,int row,int col,int killedid)
                          }
                          else
                          {
-                             if(s[moveid].col>col)
+                             if(chesspieces[moveid].col>col)
                              {
                                  if(isExistChesspieces(row-1,col+1)!=-1)
                                      return false;

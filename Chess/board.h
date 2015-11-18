@@ -8,21 +8,28 @@
 
 class Board : public QWidget
 {
+private:
     Q_OBJECT
-public:
-    explicit Board(QWidget *parent = 0);
 
     enum {NUM=32};
+
     //chesspieces
-    ChessPieces s[NUM];
+    ChessPieces chesspieces[NUM];
 
 
     int r; //the ridiant of chesspieces
-    int selectedID;
+    int start_ID;
     bool redTurn;
 
+public:
+    explicit Board(QWidget *parent = 0);
 
-   int isExistChesspieces(int row,int col);  //and return the id.
+
+
+
+    int isExistChesspieces(int row,int col);  //and return the id.
+    bool isSameColor(int id1,int id2);
+
 
 
 

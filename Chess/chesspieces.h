@@ -6,6 +6,8 @@
 
 class ChessPieces
 {
+private:
+
 public:
     ChessPieces();
 

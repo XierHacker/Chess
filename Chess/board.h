@@ -46,9 +46,19 @@ public:
     //overload mouseReleaseEvent() to response mouse action
     virtual void mouseReleaseEvent(QMouseEvent *ev);
 
+    bool canSelectChesspice(int id);
+    void tryselectChesspice(int id);
+    void killChesspice(int id);
+    void reliveChesspice(int id);
+
+    void moveChesspice(int moveid, int row, int col);
+    void moveChesspice(int moveid, int killid, int row, int col);
+
+
     QPoint rowAndcol_to_point(int row,int col);
     QPoint rowAndcol_to_point(int id); //overload locate
-    bool   point_to_rowAndcol(QPoint pt,int& row,int& col);
+    bool point_to_rowAndcol(QPoint pt,int& row,int& col);
+    bool id_to_rowAndcol(int id,int& row,int& col);
 
 signals:
 

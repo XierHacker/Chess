@@ -159,8 +159,8 @@ bool Board::isSameColor(int id1,int id2)
 {
     if(chesspieces[id1].isRed==chesspieces[id2].isRed)
         return true;
-    else
-        return false;
+
+    return false;
 }
 
 /******realize mouseEvent******/
@@ -185,37 +185,69 @@ void Board::mouseReleaseEvent(QMouseEvent *ev)
 
     if(start_ID==-1) //means I haven't chosen a chesspiece
     {
-      if(clickedID!=-1) //meanse I clicked on a chesspiece
-      {
-          //color should correspond to the game turn
-          if(chesspieces[temp_ID].isRed==redTurn)
-          {
-              start_ID=clickedID;
-              update();
-          }
-          else
-              return ;
-      }
+        tryselectChesspice(clickedID);
     }
     else        //means I have chosen a cheespiece and prepare to click the next position
     {
         //make sure the chesspiece can move
         if(canMove(start_ID,row,col,clickedID))
         {
-            //move chesspiece
-            chesspieces[start_ID].row=row;
-            chesspieces[start_ID].col=col;
-            if(clickedID!=-1) //meanse I clicked on a chesspiece
-            {
-                chesspieces[clickedID].isDead=true;
-
-            }
+            moveChesspice(start_ID,clickedID,row,col);
             start_ID=-1;
-            redTurn=!redTurn;
             update();
         }
     }
 
+}
+
+
+bool Board::canSelectChesspice(int id)
+{
+    return (redTurn==chesspieces[id].isRed);
+}
+
+void Board::tryselectChesspice(int id)
+{
+    if(id==-1)
+        return ;
+    if(!canSelectChesspice(id))
+        return ;
+    start_ID=id;
+    update();
+}
+void Board::killChesspice(int id)
+{
+    if(id==-1)      //meanse I didn't clicked on a chesspiece
+        return ;
+    else
+    {
+        chesspieces[id].isDead=true;
+    }
+}
+
+void Board::reliveChesspice(int id)
+{
+    if(id==-1)      //meanse I didn't clicked on a chesspiece
+        return ;
+    else
+    {
+        chesspieces[id].isDead=false;
+    }
+}
+
+
+void Board::moveChesspice(int moveid, int row, int col)
+{
+    chesspieces[moveid].row=row;
+    chesspieces[moveid].col=col;
+
+    redTurn=!redTurn;
+}
+
+void Board::moveChesspice(int moveid, int killid, int row, int col)
+{
+    killChesspice(killid);
+    moveChesspice(moveid, row, col);
 }
 
 
@@ -540,7 +572,6 @@ bool Board::canMove(int moveid,int row,int col,int killedid)
 
         }
        return true;
-
 }
 
 

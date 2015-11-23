@@ -33,14 +33,14 @@ public:
 
 
 
-    //rule methoed
-    bool canMove(int moveid,int row,int col,int killedid);
+
 
     //count the number of chesspices on the same line
     int chessOnLine(int start_row,int start_col,int target_row,int target_col);
 
     //overload paintEvent() to draw
     virtual void paintEvent(QPaintEvent *);
+    void drawBoard(QPainter & painter,int d);
     void drawChesspieces(QPainter & painter,int id);
 
     //overload mouseReleaseEvent() to response mouse action
@@ -51,8 +51,14 @@ public:
     void killChesspice(int id);
     void reliveChesspice(int id);
 
+    //rule methoed
+    bool canMove(int moveid,int killedid,int row,int col);
+    void trymoveChesspice(int killid,int row,int col);
     void moveChesspice(int moveid, int row, int col);
     void moveChesspice(int moveid, int killid, int row, int col);
+
+    void click(int id,int row,int col);
+    void click(QPoint pos);
 
 
     QPoint rowAndcol_to_point(int row,int col);

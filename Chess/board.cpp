@@ -29,13 +29,24 @@ Board::Board(QWidget *parent) : QWidget(parent)
 void Board::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-
     int d=60;
     r=d/2;
 
+    //draw Board
+    drawBoard(painter,d);
+    //draw chesspieces
+    for(int i=0;i<32;i++)
+    {
+        drawChesspieces(painter,chesspieces[i].id);
+    }
 
-    //drawboard
-    //draw basic structure
+}
+
+//draw Board
+void Board::drawBoard(QPainter & painter,int d)
+{
+
+    //basic structure
     for(int i=1;i<=10;i++)
     {
         painter.drawLine(QPoint(d,i*d),QPoint(9*d,i*d));
@@ -63,18 +74,9 @@ void Board::paintEvent(QPaintEvent *)
     {
 
     }
-
-    //draw chesspieces
-    for(int i=0;i<32;i++)
-    {
-        drawChesspieces(painter,chesspieces[i].id);
-    }
-
 }
 
-
-
-//how to draw singal chesspiece
+//draw chesspiece
  void Board::drawChesspieces(QPainter & painter,int id)
  {
 
@@ -166,38 +168,11 @@ bool Board::isSameColor(int id1,int id2)
 /******realize mouseEvent******/
 void Board::mouseReleaseEvent(QMouseEvent *ev)
 {
-    //get the mouse_click's position
-    QPoint pos=ev->pos();
-
-    int row,col;    //like temp value,and can be changed by the point_to_rowandcol()
-
-
-    //if clicked out the board or invalid click
-    if(point_to_rowAndcol(pos,row,col)==false)
-        return ;
-
-
-    //find which chesspiece i click
-    int temp_ID=isExistChesspieces(row,col);
-    int clickedID=-1;
-    if(temp_ID!=-1)
-        clickedID=temp_ID;
-
-    if(start_ID==-1) //means I haven't chosen a chesspiece
+    if(ev->button() != Qt::LeftButton)
     {
-        tryselectChesspice(clickedID);
+        return;
     }
-    else        //means I have chosen a cheespiece and prepare to click the next position
-    {
-        //make sure the chesspiece can move
-        if(canMove(start_ID,row,col,clickedID))
-        {
-            moveChesspice(start_ID,clickedID,row,col);
-            start_ID=-1;
-            update();
-        }
-    }
-
+    click(ev->pos());
 }
 
 
@@ -235,6 +210,18 @@ void Board::reliveChesspice(int id)
     }
 }
 
+void Board::trymoveChesspice(int killid,int row,int col)
+{
+    if(canMove(start_ID,killid,row,col))
+    {
+        moveChesspice(start_ID,killid,row,col);
+        start_ID=-1;
+        update();
+    }
+    else
+        return ;
+
+}
 
 void Board::moveChesspice(int moveid, int row, int col)
 {
@@ -242,6 +229,30 @@ void Board::moveChesspice(int moveid, int row, int col)
     chesspieces[moveid].col=col;
 
     redTurn=!redTurn;
+}
+
+
+void Board::click(int id,int row,int col)
+{
+    if(this->start_ID==-1)  //means there is nothing have been choosen
+    {
+        tryselectChesspice(id);
+    }
+    else
+    {
+        trymoveChesspice(id,row,col);
+    }
+}
+void Board::click(QPoint pos)
+{
+    int row, col;
+    bool valid_Clicked =point_to_rowAndcol(pos, row, col);
+
+    if(!valid_Clicked)  //may clicked out the board and is invalid click
+        return  ;
+
+    int id = isExistChesspieces(row, col);
+    click(id, row, col);
 }
 
 void Board::moveChesspice(int moveid, int killid, int row, int col)
@@ -271,7 +282,7 @@ int Board::chessOnLine(int start_row,int start_col,int target_row,int target_col
             if(isExistChesspieces(start_row,i)!=-1)
                 ++num;
         }
-        return num;
+       // return num;
     }
     if(start_col==target_col)
     {
@@ -282,12 +293,12 @@ int Board::chessOnLine(int start_row,int start_col,int target_row,int target_col
             if(isExistChesspieces(i,start_col)!=-1)
                 ++num;
         }
-        return num;
+       // return num;
     }
-      //  return num;
+       return num;
 }
 
-bool Board::canMove(int moveid,int row,int col,int killedid)
+bool Board::canMove(int moveid,int killedid,int row,int col)
 {
 
     //can't move on to itself

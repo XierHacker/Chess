@@ -8,8 +8,13 @@ public:
     SingleGame();
     virtual void click(int id,int row,int col);
 
-    void computerMove();
+    Step* getBestMove();
     void getAllPossibleMove(QVector<Step*>& steps);
+
+    void fakemove(Step* step);
+    void unfakemove(Step* step);
+    int cal_Score();
+
 
 
 

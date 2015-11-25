@@ -29,14 +29,8 @@ public:
     explicit Board(QWidget *parent = 0);
 
 
-
-
     int isExistChesspieces(int row,int col);  //and return the id.
     bool isSameColor(int id1,int id2);
-
-
-
-
 
 
     //count the number of chesspices on the same line
@@ -46,6 +40,7 @@ public:
     virtual void paintEvent(QPaintEvent *);
     void drawBoard(QPainter & painter,int d);
     void drawChesspieces(QPainter & painter,int id);
+
 
     //overload mouseReleaseEvent() to response mouse action
     virtual void mouseReleaseEvent(QMouseEvent *ev);

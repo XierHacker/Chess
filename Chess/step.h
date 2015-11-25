@@ -20,6 +20,7 @@ public:
 signals:
 
 public slots:
+
 };
 
 #endif // STEP_H

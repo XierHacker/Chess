@@ -2,17 +2,19 @@
 #define BOARD_H
 
 #include "chesspieces.h"
+#include "step.h"
 #include <QPoint>
 #include <QWidget>
 #include <QMouseEvent>
+#include <QVector>
 
 class Board : public QWidget
 {
 private:
     Q_OBJECT
 
+public:
     enum {NUM=32};
-
     //chesspieces
     ChessPieces chesspieces[NUM];
 
@@ -21,7 +23,9 @@ private:
     int start_ID;
     bool redTurn;
 
-public:
+    QVector<Step*> _steps;
+
+
     explicit Board(QWidget *parent = 0);
 
 
@@ -57,7 +61,9 @@ public:
     void moveChesspice(int moveid, int row, int col);
     void moveChesspice(int moveid, int killid, int row, int col);
 
-    void click(int id,int row,int col);
+    void saveStep(int moveid, int killid, int row, int col, QVector<Step*>& steps);
+
+    virtual void click(int id,int row,int col);//we can overwrite this function in subclass
     void click(QPoint pos);
 
 

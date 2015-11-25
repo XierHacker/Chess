@@ -585,7 +585,19 @@ bool Board::canMove(int moveid,int killedid,int row,int col)
        return true;
 }
 
+void Board::saveStep(int moveid, int killid, int row, int col, QVector<Step*>& steps)
+{
+   // GetRowCol(row1, col1, moveid);
+    Step* step = new Step;
+    step->_colFrom = chesspieces[moveid].col;
+    step->_colTo = col;
+    step->_rowFrom = chesspieces[moveid].col;
+    step->_rowTo = row;
+    step->_moveid = moveid;
+    step->_killid = killid;
 
+    steps.append(step);
+}
 
 
 

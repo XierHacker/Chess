@@ -17,7 +17,7 @@ void SingleGame::click(int id,int row,int col)
     if(!(this->redTurn))
     {
         Step* step=getBestMove();
-       // moveChesspice(step->_moveid,step->_killid,step->_rowTo,step->_colTo);
+        moveChesspice(step->_moveid,step->_killid,step->_rowTo,step->_colTo);
     }
 
 }
@@ -40,7 +40,7 @@ Step* SingleGame::getBestMove()
         Step* step=*it;
         fakemove(step);
         int score=cal_Score();
-      //  unfakemove(step);
+        unfakemove(step);
         if(score>maxScore)
         {
             maxScore=score;
@@ -80,14 +80,14 @@ void SingleGame::getAllPossibleMove(QVector<Step*>& steps)
 void SingleGame::fakemove(Step* step)
 {
     killChesspice(step->_killid);
-    moveChesspice(step->_moveid,step->_rowTo,step->_colTo);
+    trymoveChesspice(step->_moveid,step->_rowTo,step->_colTo);
 }
-/*
+
 void SingleGame::unfakemove(Step* step)
 {
     reliveChesspice(step->_killid);
-    moveChesspice(step->_moveid,step->_rowFrom,step->_colFrom);
-}*/
+    trymoveChesspice(step->_moveid,step->_rowFrom,step->_colFrom);
+}
 
 int SingleGame::cal_Score()
 {

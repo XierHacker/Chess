@@ -1,4 +1,5 @@
 #include "singlegame.h"
+//version 0.5.2
 
 SingleGame::SingleGame()
 {
